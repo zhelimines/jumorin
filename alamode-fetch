@@ -1,0 +1,112 @@
+#Zheng Li
+#Project1
+
+#Directory for -f flag
+DIR="" 
+#Destination for -n flag
+DESTINATION=""
+#fileName for -d flag. We have to read it from a file and generate lots of files.
+fileName=""
+valid=0;
+
+while getopts "d:n:f:" OPTIONS; do
+ case "$OPTIONS" in
+  d)
+    if [[ ! -z $DIR ]]; then
+     echo "Ops, Multiple -d"
+     exit 1
+    else
+     DIR=$OPTARG
+    fi;;
+
+  f) 
+    if [[ ! -z $fileName ]]; then
+     echo "Ops, Multiple -f"
+     exit 1
+    elif [[ ! -z $DESTINATION ]]; then
+     echo "You cannot use option -n and -f at the same time!"
+     exit 1
+    else
+     fileName=$OPTARG
+     valid=1
+    fi;;
+  n) 
+    if [[ ! -z $DESTINATION ]]; then
+     echo "$0: Multiple -n flags!"
+     exit 1
+    elif [[ ! -z $fileName ]]; then
+     echo "You cannot use -n and -f at the same time!"
+     exit 1
+    else
+     DESTINATION=$OPTARG
+     valid=1
+    fi;;
+  esac
+done
+
+
+if [[ $valid -eq 0 ]]; then
+ echo "You must be specified by either the -f or -n options!"
+ exit 1
+fi
+
+if [[ (! -z $fileName) && (! -f $fileName) ]]; then
+ echo "Destination list \"fileName\" does not exist!"
+ exit 1
+fi
+
+if [[ (! -d $DIR) && (! -z $DIR) ]]; then
+ mkdir -p $DIR
+ if [[ ! -d $DIR ]]; then
+  echo "Directory could not be created"
+  exit 1
+ fi
+fi
+
+if [[ -z $DIR ]]; then
+  DIR=`mktemp -d`
+fi
+
+temp=".tmp"
+
+if [[ ! -z $DESTINATION ]]; then
+   ssh  $DESTINATION<<endline
+   echo -n "How many users are currently logged in: " >"$DIR"/"$DESTINATION"
+   echo $arg who|wc -l >>"$DIR"/"$DESTINATION"
+   echo -n "How many processers are currently executing in each possible state for Runing:" >>"$DIR"/"$DESTINATION"
+   echo "$(ps ahux| grep -c R)">>"$DIR"/"$DESTINATION"
+   echo -n "How many processers are currently executing in each possible state for Sleeping:">>"$DIR"/"$DESTINATION"
+   echo "$(ps ahux|grep -c S)">>"$DIR"/"$DESTINATION"
+   echo -n "How many processers are currently executing in each possible state for Stopped:">>"$DIR"/"$DESTINATION"
+   echo "$(ps ahux|grep -c T)">>"$DIR"/"$DESTINATION"
+   echo -n "How many processers are currently executing in each possible state for Zombie States:">>"$DIR"/"$DESTINATION"
+   echo "$(ps ahux|grep -c Z)">>"$DIR"/"$DESTINATION"
+   echo -n "The average load for the last one, five and fifteen minutes: ">>"$DIR"/"$DESTINATION"
+   echo -n "$(cat /proc/loadavg |awk '{print $1}') ">>"$DIR"/"$DESTINATION"
+   echo -n "$(cat /proc/loadavg |awk '{print $2}') ">>"$DIR"/"$DESTINATION"
+   echo "$(cat /proc/loadavg |awk '{print $3}') ">>"$DIR"/"$DESTINATION"
+endline
+elif [[ ! -z $fileName ]]; then
+ while read line
+  do
+   ssh $line<<endline
+   echo $DIR/$line
+   echo -n "How many users are currently logged in: " >"$DIR"/"$line"
+   echo $arg who|wc -l >>"$DIR"/"$line"
+   echo -n "How many processers are currently executing in each possible state for Runing:" >>"$DIR"/"$line"
+   echo "$(ps ahux|grep -c R)">>"$DIR"/"$line"
+   echo -n "How many processers are currently executing in each possible state for Sleeping:">>"$DIR"/"$line"
+   echo "$(ps ahux|grep -c S)">>"$DIR"/"$line"
+   echo -n "How many processers are currently executing in each possible state for Stopped:">>"$DIR"/"$line"
+   echo "$(ps ahux|grep -c T)">>"$DIR"/"$line"
+   echo -n "How many processers are currently executing in each possible state for Zombie States:">>"$DIR"/"$line"
+   echo "$(ps ahux|grep -c Z)">>"$DIR"/"$line"
+   echo -n "The average load for the last one, five and fifteen minutes: ">>"$DIR"/"$line"
+   echo -n "$(cat /proc/loadavg |awk '{print $1}') ">>"$DIR"/"$line"
+   echo -n "$(cat /proc/loadavg |awk '{print $2}') ">>"$DIR"/"$line"
+   echo "$(cat /proc/loadavg |awk '{print $3}') ">>"$DIR"/"$line"
+endline
+  done <$fileName
+fi
+
+echo $DIR
