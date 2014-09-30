@@ -1,0 +1,180 @@
+#Zheng Li
+#Project1 Part2
+
+#Input and Output dir
+I_DIR=""
+O_DIR=""
+
+#Output file name
+fileName="alamode-publish.html"
+hostname=""
+
+#Get the options 
+while getopts "s:d:" OPTIONS ; do
+ case "$OPTIONS" in
+   s)
+    I_DIR=$OPTARG
+    ;;
+   d)
+    O_DIR=$OPTARG
+    ;;
+ esac
+done
+
+#Check the input directory
+if [[(! -d $I_DIR) && (! -z $I_DIR)]]; then
+ echo "Error for input directory!"
+ exit 1
+fi
+
+#if Output dir does not exit, then found one
+if [[ (! -z $O_DIR) ]]; then
+ mkdir -p $O_DIR;
+fi
+
+if [[ ! -z $O_DIR ]]; then
+ touch "$O_DIR"/"$fileName"
+fi
+
+
+if [[ ! -z $O_DIR ]]; then
+######################################################################################
+echo '<!DOCTYPE html>'>"$O_DIR"/"$fileName"
+echo '<html>'>>"$O_DIR"/"$fileName"
+
+echo '<head>'>>"$O_DIR"/"$fileName"
+echo '<style>'>>"$O_DIR"/"$fileName"
+
+echo 'table{width:100%;}'>>"$O_DIR"/"$fileName"
+echo 'table, th, td{border: 1px solid black;border-collapse: collapse;}'>>"$O_DIR"/"$fileName"
+echo 'th, td {padding: 5px;text-align: mid;}'>>"$O_DIR"/"$fileName"
+echo 'table tr:nth-child(even){background-color: #eee;}'>>"$O_DIR"/"$fileName"
+echo 'table tr:nth-child(odd) {background-color:#fff;}'>>"$O_DIR"/"$fileName"
+echo 'table th	{background-color: black;color: white;}'>>"$O_DIR"/"$fileName"
+
+echo '</style>'>>"$O_DIR"/"$fileName"
+echo '</head>'>>"$O_DIR"/"$fileName"
+
+echo '<h1>Zheng Li</h1>'>>"$O_DIR"/"$fileName"
+echo '<h2>Project2 Part2</h2>'>>"$O_DIR"/"$fileName"
+
+for element in "$I_DIR"/*; do
+
+ echo '<table sytle="width:100%">'>>"$O_DIR"/"$fileName"
+
+ hostname=$element
+ 
+ echo '<h3>'"$hostname"'</h3>'>>"$O_DIR"/"$fileName"
+
+ echo '<tr>'>>"$O_DIR"/"$fileName"
+
+ echo '<th>How many users are currently logged in</th>'>>"$O_DIR"/"$fileName" 
+ echo '<th>How many processers for Running</th>'>>"$O_DIR"/"$fileName"
+ echo '<th>How many processers for Sleeping</th>'>>"$O_DIR"/"$fileName"
+ echo '<th>How many processers for Stopped</th>'>>"$O_DIR"/"$fileName"
+ echo '<th>How many processers for Zombie States</th>'>>"$O_DIR"/"$fileName"
+ echo '<th>The average load for ONE min</th>'>>"$O_DIR"/"$fileName"
+ echo '<th>The average load for FIVE mins</th>'>>"$O_DIR"/"$fileName"
+ echo '<th>The average load for FIFTEEN mins</th>'>>"$O_DIR"/"$fileName"
+
+ echo '</tr>'>>"$O_DIR"/"$fileName"
+ 
+ echo '<tr>'>>"$O_DIR"/"$fileName"
+ i=0
+ a=5
+ while read line 
+  do
+  arr=$(echo $line | tr ":" "\n")
+  for x in $arr
+  do
+   if [[ "$x" == [0-9]* ]]; then
+    i=$((i+1))
+    if [[ ("$x" == [1-9]*) && ("$i" -gt "$a") ]]; then 
+     echo '<td style="color:red">'"$x"'</td>'>>"$O_DIR"/"$fileName"
+    else
+     echo '<td>'"$x"'</td>'>>"$O_DIR"/"$fileName"
+    fi
+   fi   
+  done
+ done <$element
+ echo '</tr>'>>"$O_DIR"/"$fileName"
+ 
+
+ echo '</table>'>>"$O_DIR"/"$fileName"
+ echo '<br>'>>"$O_DIR"/"$fileName"
+done
+
+echo '</body>'>>"$O_DIR"/"$fileName"
+echo '</html>'>>"$O_DIR"/"$fileName"
+##############################################################################################
+else
+ 
+echo '<!DOCTYPE html>'
+echo '<html>'
+
+echo '<head>'
+echo '<style>'
+
+echo 'table{width:100%;}'
+echo 'table, th, td{border: 1px solid black;border-collapse: collapse;}'
+echo 'th, td {padding: 5px;text-align: mid;}'
+echo 'table tr:nth-child(even){background-color: #eee;}'
+echo 'table tr:nth-child(odd) {background-color:#fff;}'
+echo 'table th  {background-color: black;color: white;}'
+
+echo '</style>'
+echo '</head>'
+
+echo '<h1>Zheng Li</h1>'
+echo '<h2>Project2 Part2</h2>'
+
+
+for element in "$I_DIR"/*; do
+
+ echo '<table sytle="width:100%">'
+
+ hostname=$element
+
+ echo '<h3>'"$hostname"'</h3>'
+
+ echo '<tr>'
+
+ echo '<th>How many users are currently logged in</th>'
+ echo '<th>How many processers for Running</th>'
+ echo '<th>How many processers for Sleeping</th>'
+ echo '<th>How many processers for Stopped</th>'
+ echo '<th>How many processers for Zombie States</th>'
+ echo '<th>"The average load for ONE min</th>'
+ echo '<th>The average load for FIVE mins</th>'
+ echo '<th>The average load for FIFTEEN mins</th>'
+
+ echo '</tr>'
+
+ echo '<tr>'
+ i=0
+ a=5
+ while read line
+  do
+  arr=$(echo $line | tr ":" "\n")
+  for x in $arr
+  do
+   if [[ "$x" == [0-9]* ]]; then
+    i=$((i+1))
+    if [[ ("$x" == [1-9]*) && ("$i" -gt "$a") ]]; then
+     echo '<td style="color:red">'"$x"'</td>'
+    else
+     echo '<td>'"$x"'</td>'
+    fi
+   fi
+  done
+ done <$element
+ echo '</tr>'
+ echo '</table>'
+ echo '<br>'
+done
+
+echo '</body>'
+echo '</html>'
+
+fi
+################################################################################
