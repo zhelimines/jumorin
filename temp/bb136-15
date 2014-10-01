@@ -1,0 +1,6 @@
+How many users are currently logged in: 5
+How many processers are currently executing in each possible state for Runing:3
+How many processers are currently executing in each possible state for Sleeping:255
+How many processers are currently executing in each possible state for Stopped:6
+How many processers are currently executing in each possible state for Zombie States:4
+The average load for the last one, five and fifteen minutes: 0.16 1.5 1.0 
